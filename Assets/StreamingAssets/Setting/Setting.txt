@@ -1,0 +1,27 @@
+///配置文件///
+///IP和端口///
+httpip:127.0.0.1
+udpip:127.0.0.1
+tcpip:127.0.0.1
+httpport:8030
+udpport:8886
+tcpport:4210
+///系统配置///
+//2全屏 3为定时强制定位
+max:2
+//是否置顶 0不置顶  1置顶
+topmost:1
+left:0
+top:0
+width:1920
+height:1080
+//启动模式 1 是正常启动 0是最小化启动
+startmode:1
+//是否隐藏鼠标 0隐藏 1不隐藏
+hidecursor:1
+//是否隐藏任务栏 0不隐藏 1 隐藏
+hidetaskbar:1
+//是否调试模式
+debug:0
+//返回屏保时间 0为不启动 单位秒
+backtime:0
