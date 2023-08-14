@@ -6,3 +6,5 @@ UserSettings
 Assembly-CSharp.csproj
 Assembly-CSharp-Editor.csproj
 gitexample.sln
+Obj
+.vs
