@@ -23,9 +23,10 @@ public class gameEnter : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         FilePath.Init();//初始化所有文件路径
         Common.Init();//初始化常量
-        WindowMode.Instance.SetWindowMode();
+        WindowMode.Instance.SetWindowMode();//屏幕初始化
         //ApplicationSetting.Init();//系统初始化
         NetInit();//初始化网络模式
+        PoolMgr.instance.Init();//初始化对象池
         UIMgr.instance.Init();//UI初始化
     }
     void Start()
@@ -37,6 +38,12 @@ public class gameEnter : MonoBehaviour
     void Update()
     {
         OnUpdateResourceGC();
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            
+            PoolMgr.Despawn(PoolMgr.Spawn(PoolMgr.instance.poolDatas[0].prefab, Vector3.zero, default),3);
+        }
+ 
     }
     private float lastGCTime;
     //自动垃圾回收
