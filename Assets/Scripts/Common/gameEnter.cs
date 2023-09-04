@@ -23,15 +23,16 @@ public class gameEnter : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         FilePath.Init();//初始化所有文件路径
         Common.Init();//初始化常量
-        WindowMode.Instance.SetWindowMode();//屏幕初始化
+        WindowMode.Instance.SetWindowMode();//屏幕初始化  
         //ApplicationSetting.Init();//系统初始化
+        LongTimeNoOperationOneTime.Instance.StartTime();
         NetInit();//初始化网络模式
         PoolMgr.instance.Init();//初始化对象池
         UIMgr.instance.Init();//UI初始化
     }
     void Start()
     {
-       
+      
     }
 
     // Update is called once per frame
