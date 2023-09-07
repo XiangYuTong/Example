@@ -681,4 +681,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad41927d0fbe7c34191b76dce6856009, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poolDatas: []
+  poolDatas:
+  - prefab: {fileID: 0}
+    preLoad: 0
+    limit: 0
+    maxCount: 0

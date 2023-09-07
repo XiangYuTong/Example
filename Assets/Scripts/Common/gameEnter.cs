@@ -25,7 +25,6 @@ public class gameEnter : MonoBehaviour
         Common.Init();//初始化常量
         WindowMode.Instance.SetWindowMode();//屏幕初始化  
         //ApplicationSetting.Init();//系统初始化
-        LongTimeNoOperationOneTime.Instance.StartTime();
         NetInit();//初始化网络模式
         PoolMgr.instance.Init();//初始化对象池
         UIMgr.instance.Init();//UI初始化
@@ -40,9 +39,8 @@ public class gameEnter : MonoBehaviour
     {
         OnUpdateResourceGC();
         if (Input.GetKeyDown(KeyCode.W))
-        {
-            
-            PoolMgr.Despawn(PoolMgr.Spawn(PoolMgr.instance.poolDatas[0].prefab, Vector3.zero, default),3);
+        { 
+            PoolMgr.instance.Despawn(PoolMgr.instance.Spawn(PoolMgr.instance.poolDatas[0].prefab, Vector3.zero, default),3);
         }
  
     }

@@ -2,13 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
+using static PoolMgr;
 
 /// <summary>
 /// 对象池
 /// </summary>
 public class PoolMgr : MonoBehaviour
-{
+{   
     private static PoolMgr _instance;//单例
 
     public static PoolMgr instance
@@ -40,7 +42,7 @@ public class PoolMgr : MonoBehaviour
             CreatePool(poolDatas[i].prefab, poolDatas[i].preLoad, poolDatas[i].limit, poolDatas[i].maxCount);
         }
     }
-    public static void Add(Pool pool)
+    public void Add(Pool pool)
     {
         //检查预制体对象
         if (pool.prefab == null)
@@ -66,7 +68,7 @@ public class PoolMgr : MonoBehaviour
     /// <param name="preLoad"></param>
     /// <param name="limit"></param>
     /// <param name="maxCount"></param>
-    public static void CreatePool(GameObject prefab, int preLoad, bool limit, int maxCount)
+    public  void CreatePool(GameObject prefab, int preLoad, bool limit, int maxCount)
     {
         //debug error if pool was already added before 
         if (Pools.ContainsKey(prefab))
@@ -74,10 +76,23 @@ public class PoolMgr : MonoBehaviour
             Debug.LogError("Pool Manager already contains Pool for prefab: " + prefab.name);
             return;
         }
-
+        if (prefab == null)
+        {
+            Debug.LogError("对象池对象中未放入指定的预制体！");
+            return;
+        }
         //create new gameobject which will hold the new Pool component
         GameObject newPoolGO = new GameObject("Pool " + prefab.name);
-        newPoolGO.transform.parent = instance.transform;
+        if (prefab.GetComponent<RectTransform>())
+        {
+            newPoolGO.layer = LayerMask.NameToLayer("UI");
+            newPoolGO.transform.parent = UIMgr.instance.transform;
+            newPoolGO.transform.localPosition = Vector3.zero;
+        }
+        else
+        {
+            newPoolGO.transform.parent = instance.transform;
+        }
         //add Pool component to the new gameobject in the scene
         Pool newPool = newPoolGO.AddComponent<Pool>();
         //assign default parameters
@@ -93,14 +108,14 @@ public class PoolMgr : MonoBehaviour
     /// <summary>
     /// 创建对象池对象
     /// </summary>
-    public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
+    public  GameObject Spawn(GameObject prefab, Vector3 position, Quaternion rotation)
     {
         //debug a Log entry in case the prefab was not found in a Pool
         //this is not critical as then we create a new Pool for it at runtime
         if (!Pools.ContainsKey(prefab))
         {
             Debug.Log("Prefab not found in existing pool: " + prefab.name + " New Pool has been created.");
-            CreatePool(prefab, 0, false, 0);
+            CreatePool(prefab, 0, false, 0);       
         }
 
         //spawn instance in the corresponding Pool
@@ -108,7 +123,7 @@ public class PoolMgr : MonoBehaviour
     }
 
 
-    public static void Despawn(GameObject instance, float time = 0f)
+    public  void Despawn(GameObject instance, float time = 0f)
     {
         if (time > 0) GetPool(instance).Despawn(instance, time);
         else GetPool(instance).Despawn(instance);
@@ -119,7 +134,7 @@ public class PoolMgr : MonoBehaviour
     /// </summary>
     /// <param name="instance"></param>
     /// <returns></returns>
-    public static Pool GetPool(GameObject instance)
+    public  Pool GetPool(GameObject instance)
     {
         //go over Pools and find the instance
         foreach (GameObject prefab in Pools.Keys)
@@ -137,7 +152,7 @@ public class PoolMgr : MonoBehaviour
     /// <summary>
     /// 删除Pool的所有实例，使它们可供以后使用。
     /// </summary>
-    public static void DeactivatePool(GameObject prefab)
+    public  void DeactivatePool(GameObject prefab)
     {
         //debug error if Pool wasn't already added before
         if (!Pools.ContainsKey(prefab))
@@ -155,7 +170,7 @@ public class PoolMgr : MonoBehaviour
         }
     }
 
-    public static void DestroyAllInactive(bool limitToPreLoad)
+    public  void DestroyAllInactive(bool limitToPreLoad)
     {
         foreach (GameObject prefab in Pools.Keys)
             Pools[prefab].DestroyUnused(limitToPreLoad);
@@ -166,7 +181,7 @@ public class PoolMgr : MonoBehaviour
     /// 销毁对象池
     /// </summary>
     /// <param name="prefab"></param>
-    public static void DestroyPool(GameObject prefab)
+    public  void DestroyPool(GameObject prefab)
     {
         if (!Pools.ContainsKey(prefab))
         {
@@ -182,7 +197,7 @@ public class PoolMgr : MonoBehaviour
     /// <summary>
     /// 销毁所有池
     /// </summary>
-    public static void DestroyAllPools()
+    public  void DestroyAllPools()
     {
         foreach (GameObject prefab in Pools.Keys)
             DestroyPool(Pools[prefab].gameObject);
