@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
 using System.IO;
+using UnityEditor.Experimental.GraphView;
 
 public class UdpSender : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class UdpSender : MonoBehaviour
     {
         Instance = this;
         ip = Common.udpip;
+        port=Common.udpport;
         MyStart();
     }
 

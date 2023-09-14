@@ -61,7 +61,10 @@ public class LongTimeNoOperationOneTime : MonoBehaviour
             //有屏幕手指 接触
             if (Input.touchCount > 0) lasterTime = nowTime;//更新触摸时间
         }
-
+        if (Input.touchCount > 0)
+        {
+            lasterTime = nowTime;
+        }
         //判断无操作时间是否达到指定时长，若达到指定时长无操作，则执行TakeOperate
         float offsetTime = Mathf.Abs(nowTime - lasterTime);
         if (offsetTime > Common.backtime) TakeOperate();
@@ -74,11 +77,15 @@ public class LongTimeNoOperationOneTime : MonoBehaviour
     public void TakeOperate()
     {
         Debug.Log("执行");
+   
+     
         check = false;
     }
     public void StartTime()
     {
         check = true;
         lasterTime = Time.time;
+       
+
     }
 }
