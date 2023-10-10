@@ -38,11 +38,6 @@ public class gameEnter : MonoBehaviour
     void Update()
     {
         OnUpdateResourceGC();
-        if (Input.GetKeyDown(KeyCode.W))
-        { 
-            PoolMgr.instance.Despawn(PoolMgr.instance.Spawn(PoolMgr.instance.poolDatas[0].prefab, Vector3.zero, default),3);
-        }
- 
     }
     private float lastGCTime;
     //自动垃圾回收

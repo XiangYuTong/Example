@@ -75,13 +75,21 @@ public class Common
     /// TCPIP地址
     /// </summary>
     public static string tcpip;
+    /// <summary>
+    /// 用于获取视频路径筛选的数组
+    /// </summary>
+    private static List<string> videoExtensions = new List<string>() { ".mp4", ".avi", ".mov", ".m4v" };
+    /// <summary>
+    /// 视频路径
+    /// </summary>
+    public static string[] videoFileName;
     public static void Init()
     {
         Setting set = new Setting();
         set.Open(FilePath.SettingPath);
         max = Int16.Parse(set.ReadValue("max", "0"));
-        topmost= Int16.Parse(set.ReadValue("topmost", "1"));
-        left= Int16.Parse(set.ReadValue("left", "0"));
+        topmost = Int16.Parse(set.ReadValue("topmost", "1"));
+        left = Int16.Parse(set.ReadValue("left", "0"));
         top = Int16.Parse(set.ReadValue("top", "0"));
         width = Int16.Parse(set.ReadValue("width", "1920"));
         height = Int16.Parse(set.ReadValue("height", "1080"));
@@ -96,5 +104,41 @@ public class Common
         udpip = set.ReadValue("udpip", "127.0.0.1");
         tcpport = Int16.Parse(set.ReadValue("tcpport", "4020"));
         tcpip = set.ReadValue("tcpip", "127.0.0.1");
+
+        GetVideoFiles(FilePath.VideoPath, out videoFileName);
+    }
+
+    public static void GetVideoFiles(string path, out string[] resultFileName)
+    {
+        List<string> temp = new List<string>();
+        try
+        {
+            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                string file = files[i];
+                // 判断文件扩展名是否在视频文件扩展名列表中
+                if (videoExtensions.Contains(System.IO.Path.GetExtension(file).ToLower()))
+                {
+                    // 如果文件扩展名是.mp4，则将其添加到videoFiles数组中
+                    // resultFileName[i] = file;
+                    temp.Add(file);
+                }
+                //else if ( System.IO.Path.GetExtension(file).ToLower() == ".avi" || System.IO.Path.GetExtension(file).ToLower() == ".mov"|| System.IO.Path.GetExtension(file).ToLower() == ".m4v")
+                //{
+                //    // 如果文件扩展名不是.mp4，则尝试获取其他格式的视频文件
+                //    //resultFileName[i] = file;
+                //    temp.Add(file);
+                //}
+            }
+        }
+        catch
+        {
+            Debug.LogError("Videos文件夹不存在,请检查");
+        }
+        resultFileName = temp.ToArray();
+
     }
 }
