@@ -37,6 +37,10 @@ public class JudgeSlide : MonoBehaviour
 
             if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Ended)
             {
+               
+            }
+            if (touch.phase == TouchPhase.Canceled)
+            {
                 fingerUpPosition = touch.position;
                 CheckSwipeGesture();
             }
