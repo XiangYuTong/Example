@@ -23,6 +23,7 @@ public class gameEnter : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         FilePath.Init();//初始化所有文件路径
         Common.Init();//初始化常量
+        DataMgr.Instance.Init();
         WindowMode.Instance.SetWindowMode();//屏幕初始化  
         //ApplicationSetting.Init();//系统初始化
         NetInit();//初始化网络模式
@@ -30,8 +31,9 @@ public class gameEnter : MonoBehaviour
         UIMgr.instance.Init();//UI初始化
     }
     void Start()
-    {
-      
+    {   
+
+       
     }
 
     // Update is called once per frame
@@ -84,8 +86,4 @@ public class gameEnter : MonoBehaviour
                 break;
         }
     }
-
-
-
-
 }
