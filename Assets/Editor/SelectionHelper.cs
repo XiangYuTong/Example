@@ -24,7 +24,7 @@ internal class SelectionHelper
 
     private static void ProjectWindowItemOnGUI(string guid, Rect selectionRect)
     {
-        if (Event.current.type == EventType.KeyDown
+        if (Event.current.type == UnityEngine.EventType.KeyDown
             && Event.current.keyCode == KeyCode.Space
             && selectionRect.Contains(Event.current.mousePosition))
         {
@@ -52,7 +52,7 @@ internal class SelectionHelper
     private static void HierarchyWindowItemOnGUI(int instanceID, Rect selectionRect)
     {
         Event e = Event.current;
-        if (e.type == EventType.KeyDown)
+        if (e.type == UnityEngine.EventType.KeyDown)
         {
             switch (e.keyCode)
             {
