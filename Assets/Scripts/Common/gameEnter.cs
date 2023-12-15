@@ -12,8 +12,12 @@ public class gameEnter : MonoBehaviour
     {
         None, UdpSender, UdpReceiver, TcpSender, TcpReceiver
     }
+  
+
     [Header("网络模式")]
     public NetType netType;
+    [Header("时间管理器开关")]
+    public bool timerEnable;
     // Start is called before the first frame update
     /// <summary>
     /// 所有系统初始化
@@ -27,6 +31,7 @@ public class gameEnter : MonoBehaviour
         WindowMode.Instance.SetWindowMode();//屏幕初始化  
         //ApplicationSetting.Init();//系统初始化
         NetInit();//初始化网络模式
+        TimeInit();//初始化延时管理器
         PoolMgr.instance.Init();//初始化对象池
         UIMgr.instance.Init();//UI初始化
     }
@@ -85,5 +90,9 @@ public class gameEnter : MonoBehaviour
             default:
                 break;
         }
+    }
+    private void TimeInit()
+    {
+        TimerMgr.instance.enabled = timerEnable;
     }
 }

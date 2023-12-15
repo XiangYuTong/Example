@@ -82,6 +82,32 @@ public class UIMgr : MonoBehaviour
         ui_dict[typeof(T).Name].Close();
         return (T)ui_dict[typeof(T).Name];
     }
+    /// <summary>
+    /// 通过Close关闭所有开着的Plane
+    /// </summary>
+    public void CloseAll()
+    {
+        foreach (var item in ui_dict)
+        {
+            if (item.Value.isOpen)
+                item.Value.Close();
+        } 
+    }
+    /// <summary>
+    /// 直接通过setactivity去关闭所有开着的Plane
+    /// </summary>
+    public void CloseAllWithoutNotify()
+    {
+        foreach (var item in ui_dict)
+        {
+            if (item.Value.isOpen)
+            {
+                item.Value.isOpen = false;
+                item.Value.gameObject.SetActive(false);
+            }
+                
+        }
+    }
     // Update is called once per frame
     void Update()
     {

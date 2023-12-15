@@ -27,7 +27,7 @@ public class DataMgr : MonoBehaviour
 	public List<Sheet1> Sheet1_list;
 	public void Init(){	
 
-		Sheet1_list = ExcelTool.ReadExcel<Sheet1>(0);
+		//Sheet1_list = ExcelTool.ReadExcel<Sheet1>(0);
 	}
 
 	public void SaveAll(JsonType type = JsonType.LitJson){
@@ -35,6 +35,6 @@ public class DataMgr : MonoBehaviour
 	}
 	public void Save(object data, string fileName,JsonType type = JsonType.LitJson){
 
-		JsonManager.Instance.SaveData(data,fileName,type);
+		//JsonManager.Instance.SaveData(data,fileName,type);
 	}
 }
