@@ -29,7 +29,7 @@ public class TimerMgr : MonoBehaviour, IAnimatable
 
     private static TimerMgr _instance;//单例
 
-    public static TimerMgr instance
+    public static TimerMgr Instance
     {
         get
         {
@@ -38,7 +38,10 @@ public class TimerMgr : MonoBehaviour, IAnimatable
                 TimerMgr ins = FindObjectOfType<TimerMgr>();
                 if (ins == null)
                 {
-                    Debug.LogError("场景中没有TimerMgr组件，请添加");
+                    Debug.LogError("场景中没有TimerMgr组件，已经自动生成");
+                    GameObject go = new GameObject(nameof(TimerMgr));
+                    go.transform.parent = GameManager.instance.transform;
+                    _instance = go.AddComponent<TimerMgr>();
                 }
                 else
                 {
@@ -47,6 +50,11 @@ public class TimerMgr : MonoBehaviour, IAnimatable
             }
             return _instance;
         }
+    }
+
+    public void Init()
+    {
+
     }
     private void Update()
     {

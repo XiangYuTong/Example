@@ -1,12 +1,14 @@
 ﻿//using Running.ReadSetting;
 using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class WindowMode : MonoBehaviour
 {
-    private static WindowMode windowMode;
+    private static WindowMode _instance;
     #region  WinAPI
     [DllImport("user32.dll")]
     private static extern IntPtr SetWindowLong(IntPtr hwnd, int _nIndex, int dwNewLong);
@@ -42,24 +44,29 @@ public class WindowMode : MonoBehaviour
     private static int HWND_TOPMOST = -1;
     private static int HWND_TOP = 0;
     #endregion
+
+
     public static WindowMode Instance
     {
         get
         {
-            if (windowMode == null)
+            if (_instance == null)
             {
                 WindowMode ins = FindObjectOfType<WindowMode>();
                 if (ins == null)
                 {
-                    Debug.LogError("场景中没有UIMgr组件，请添加");
+                    UnityEngine.Debug.LogError("场景中没有WindowMode组件，已经自动生成");
+                    GameObject go = new GameObject(nameof(WindowMode));
+                    go.transform.parent = GameManager.instance.transform;
+                    _instance = go.AddComponent<WindowMode>();
                 }
                 else
                 {
-                    windowMode = ins;
+                    _instance = ins;
                     Init();
                 }
             }
-            return windowMode;
+            return _instance;
         }
     }
     private static void Init()
@@ -180,6 +187,15 @@ public class WindowMode : MonoBehaviour
         {
             ShowWindow(FindWindow("Shell_TrayWnd", null), SW_HIDE);
             ShowWindow(FindWindow("Button", null), SW_HIDE);
+        }
+    }
+    void OnApplicationQuit()
+    {
+
+        if (!Application.isEditor)
+        {
+            ShowTaskbar();
+            Process.GetCurrentProcess().Kill();
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class DataMgr : MonoBehaviour
@@ -14,7 +15,10 @@ public class DataMgr : MonoBehaviour
 				DataMgr ins = FindObjectOfType<DataMgr>();
 				if (ins == null)
 				{
-					Debug.LogError("场景中没有DataMgr组件，请添加");
+					Debug.LogError("场景中没有DataMgr组件，已经自动生成");
+					GameObject go = new GameObject(nameof(DataMgr));
+					go.transform.parent = GameManager.instance.transform;
+					_instance = go.AddComponent<DataMgr>();
 				}
 				else
 				{
@@ -24,10 +28,14 @@ public class DataMgr : MonoBehaviour
 			return _instance;
 		}
 	}
-	public List<Sheet1> Sheet1_list;
+	//表格：data_0
+	public List<MainData> data_0_MainData_list;
+	//表格：data_1
+	public List<MainData> data_1_MainData_list;
 	public void Init(){	
 
-		//Sheet1_list = ExcelTool.ReadExcel<Sheet1>(0);
+		data_0_MainData_list = ExcelTool.ReadExcel<MainData>(0,0);
+		data_1_MainData_list = ExcelTool.ReadExcel<MainData>(0,1);
 	}
 
 	public void SaveAll(JsonType type = JsonType.LitJson){
@@ -35,6 +43,6 @@ public class DataMgr : MonoBehaviour
 	}
 	public void Save(object data, string fileName,JsonType type = JsonType.LitJson){
 
-		//JsonManager.Instance.SaveData(data,fileName,type);
+		JsonManager.Instance.SaveData(data,fileName,type);
 	}
 }

@@ -52,7 +52,7 @@ public class AddCreatePanelWindow : EditorWindow
                 tip = "模板内容为空,请检查！";
                 return;
             }
-            panel.transform.parent = uimgr.transform;
+            panel.transform.parent = uimgr.transform.GetChild(0).transform;
             panel.name = panelName;
 
 

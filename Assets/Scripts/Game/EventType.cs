@@ -1,5 +1,6 @@
-﻿public enum EventType
+﻿public enum EventTypes
 {
+    UdpMessageHandle,
     ShowText,
     KeyDown
 }

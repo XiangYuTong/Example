@@ -7,7 +7,7 @@ public class UIMgr : MonoBehaviour
 {
     private static UIMgr _instance;//µ¥Àý
 
-    public static UIMgr instance
+    public static UIMgr Instance
     {
         get
         {

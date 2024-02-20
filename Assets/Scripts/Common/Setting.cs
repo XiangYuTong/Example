@@ -58,5 +58,9 @@ public class Setting
         }
         
     }
-
+    public static string[] ReadTextSplit(string text, char sp)
+    {
+        string[] strings = text.Split(sp);
+        return strings;
+    }
 }

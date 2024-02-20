@@ -13,7 +13,7 @@ public class PoolMgr : MonoBehaviour
 {   
     private static PoolMgr _instance;//单例
 
-    public static PoolMgr instance
+    public static PoolMgr Instance
     {
         get
         {
@@ -86,12 +86,12 @@ public class PoolMgr : MonoBehaviour
         if (prefab.GetComponent<RectTransform>())
         {
             newPoolGO.layer = LayerMask.NameToLayer("UI");
-            newPoolGO.transform.parent = UIMgr.instance.transform;
+            newPoolGO.transform.parent = UIMgr.Instance.transform;
             newPoolGO.transform.localPosition = Vector3.zero;
         }
         else
         {
-            newPoolGO.transform.parent = instance.transform;
+            newPoolGO.transform.parent = Instance.transform;
         }
         //add Pool component to the new gameobject in the scene
         Pool newPool = newPoolGO.AddComponent<Pool>();

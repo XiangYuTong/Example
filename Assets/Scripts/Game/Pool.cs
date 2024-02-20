@@ -31,7 +31,7 @@ public class Pool : MonoBehaviour
     {
         if (prefab == null) return;
 
-        PoolMgr.instance.Add(this);
+        PoolMgr.Instance.Add(this);
 
         PreLoad();
     }

@@ -12,15 +12,15 @@ using System.Text;
 using System;
 using UnityEditor;
 using UnityEngine;
-using DG.Tweening.Plugins.Core.PathCore;
-using System.Security.Cryptography;
 using Unity.VisualScripting;
+using System.Linq;
 
 public class ExcelWindow : EditorWindow
 {
-    private string txt_ExcelName = "data.xlsx"; //表格名称
+    private string txt_ExcelName = "data.xls"; //表格名称
     private string txt_JsonSavePath = "Json";
     private string txt_EntitySavePath = "Entity";
+    private bool isMultiple = false;
     private Vector2 scrollPos;
     [MenuItem("Tools/ExcelToJson")]
     static void OpenWindow()
@@ -43,6 +43,11 @@ public class ExcelWindow : EditorWindow
         txt_JsonSavePath = GUILayout.TextField(txt_JsonSavePath);
         EditorGUILayout.EndHorizontal();
 
+        EditorGUILayout.BeginHorizontal();
+        //GUILayout.Label("Json保存路径: ");
+        isMultiple = GUILayout.Toggle(isMultiple,"是否读取多个表格");
+        EditorGUILayout.EndHorizontal();
+
         if (GUILayout.Button("生成实体类"))
         {
             CreateEntities();
@@ -57,7 +62,15 @@ public class ExcelWindow : EditorWindow
         }
         if (GUILayout.Button("生成Excel数据读取管理器"))
         {
-            CreateExcelDataMgr();
+            if (!isMultiple)
+            {
+                CreateExcelDataMgr();
+            }
+            else
+            {
+                CreateMultipleExcelDataMgr();
+            }
+           
         }
         EditorGUILayout.EndScrollView();
     }
@@ -297,6 +310,235 @@ public class ExcelWindow : EditorWindow
 
 
     }
+
+    private void CreateMultipleExcelDataMgr()
+    {
+        string[] excelNames = Common.GetExcelFiles(Application.streamingAssetsPath + "/Excel"); 
+        Dictionary<string, List<string>> path_Dict = new Dictionary<string, List<string>>();
+      
+
+        for (int i = 0; i < excelNames.Length; i++)
+        {
+            if (!string.IsNullOrEmpty(excelNames[i]))
+            {
+                using (FileStream fs = new FileStream(excelNames[i], FileMode.Open, FileAccess.Read))
+                {
+                    using (ExcelPackage ep = new ExcelPackage(fs))
+                    {
+                        //获得所有工作表
+                        ExcelWorksheets workSheets = ep.Workbook.Worksheets;
+                        
+                        List<string> temp = new List<string>();
+                        for (int j = 1; j <= workSheets.Count; j++)
+                        {
+                            Debug.Log(workSheets[j].Name);
+                            temp.Add(workSheets[j].Name);
+                        }
+                        path_Dict.Add(Path.GetFileNameWithoutExtension(fs.Name), temp);
+                       
+                    }
+                }
+            }
+        }
+
+        string dir = $"{Application.dataPath}/Scripts/Game";
+        string path = $"{dir}/DataMgr.cs";
+
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("using System.Collections;");
+        sb.AppendLine("using System.Collections.Generic;");
+        sb.AppendLine("using UnityEngine;");
+        sb.AppendLine();
+        sb.AppendLine("public class DataMgr : MonoBehaviour");
+        sb.AppendLine("{");
+        sb.AppendLine("\tprivate static DataMgr _instance;");
+        sb.AppendLine("\tpublic static DataMgr Instance");
+        sb.AppendLine("\t{");
+        sb.AppendLine("\t\tget");
+        sb.AppendLine("\t\t{");
+        sb.AppendLine("\t\t\t if (_instance == null)");
+        sb.AppendLine("\t\t\t{");
+        sb.AppendLine("\t\t\t\tDataMgr ins = FindObjectOfType<DataMgr>();");
+        sb.AppendLine("\t\t\t\tif (ins == null)");
+        sb.AppendLine("\t\t\t\t{");
+        sb.AppendLine("\t\t\t\t\tDebug.LogError(\"场景中没有DataMgr组件，请添加\");");
+        sb.AppendLine("\t\t\t\t}");
+        sb.AppendLine("\t\t\t\telse");
+        sb.AppendLine("\t\t\t\t{");
+        sb.AppendLine("\t\t\t\t\t _instance = ins;");
+        sb.AppendLine("\t\t\t\t}");
+        sb.AppendLine("\t\t\t}");
+        sb.AppendLine("\t\t\treturn _instance;");
+        sb.AppendLine("\t\t}");
+        sb.AppendLine("\t}");
+
+        for (int i = 0; i < path_Dict.Count; i++)
+        {
+            sb.AppendLine($"\t//表格：{path_Dict.ElementAt(i).Key}");
+            for (int j = 0; j < path_Dict.ElementAt(i).Value.Count; j++)
+            {
+                Debug.Log($"\tpublic List<{path_Dict.ElementAt(i).Value[j]}> {path_Dict.ElementAt(i).Key}_{path_Dict.ElementAt(i).Value[j]}_list;");
+                sb.AppendLine($"\tpublic List<{path_Dict.ElementAt(i).Value[j]}> {path_Dict.ElementAt(i).Key}_{path_Dict.ElementAt(i).Value[j]}_list;");
+            }
+        }
+
+
+
+
+        sb.AppendLine("\tpublic void Init(){\t\n");
+
+        for (int i = 0; i < path_Dict.Count; i++)
+        {
+            for (int j = 0; j < path_Dict.ElementAt(i).Value.Count; j++)
+            {
+                //Debug.Log($"\tpublic List<{path_Dict.ElementAt(i).Value[j]}> {path_Dict.ElementAt(i).Key}_{path_Dict.ElementAt(i).Value[j]}_list;");
+                sb.AppendLine($"\t\t{path_Dict.ElementAt(i).Key}_{path_Dict.ElementAt(i).Value[j]}_list = ExcelTool.ReadExcel<{path_Dict.ElementAt(i).Value[j]}>({j},{i});");
+            }
+        }
+        //for (int i = 1; i <= workSheets.Count; i++)
+        //{
+        //    Debug.Log(workSheets[i].Name);
+        //    sb.AppendLine($"\t\t{workSheets[i].Name}_list = ExcelTool.ReadExcel<{workSheets[i].Name}>({i - 1});");
+        //}
+
+
+        sb.AppendLine("\t}\n");
+
+        sb.AppendLine("\tpublic void SaveAll(JsonType type = JsonType.LitJson){\n");
+
+
+
+        sb.AppendLine("\t}");
+
+
+        sb.AppendLine("\tpublic void Save(object data, string fileName,JsonType type = JsonType.LitJson){\n");
+        sb.AppendLine($"\t\tJsonManager.Instance.SaveData(data,fileName,type);");
+        sb.AppendLine("\t}");
+
+
+
+        sb.AppendLine("}");
+        AssetDatabase.Refresh();
+        try
+        {
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            if (!File.Exists(path))
+            {
+                File.Create(path).Dispose(); //避免资源占用
+            }
+            File.WriteAllText(path, sb.ToString());
+            AssetDatabase.Refresh();
+        }
+        catch (System.Exception e)
+        {
+
+        }
+
+        //if (!string.IsNullOrEmpty(txt_ExcelName))
+        //{
+        //    string filepath = Application.streamingAssetsPath + "/Excel/";
+        //    using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+        //    {
+        //        using (ExcelPackage ep = new ExcelPackage(fs))
+        //        {
+        //            //获得所有工作表
+        //            ExcelWorksheets workSheets = ep.Workbook.Worksheets;
+        //            //遍历所有工作表
+
+
+        //            string dir = $"{Application.dataPath}/Scripts/Game";
+        //            string path = $"{dir}/DataMgr.cs";
+
+        //            StringBuilder sb = new StringBuilder();
+        //            sb.AppendLine("using System.Collections;");
+        //            sb.AppendLine("using System.Collections.Generic;");
+        //            sb.AppendLine("using UnityEngine;");
+        //            sb.AppendLine();
+        //            sb.AppendLine("public class DataMgr : MonoBehaviour");
+        //            sb.AppendLine("{");
+        //            sb.AppendLine("\tprivate static DataMgr _instance;");
+        //            sb.AppendLine("\tpublic static DataMgr Instance");
+        //            sb.AppendLine("\t{");
+        //            sb.AppendLine("\t\tget");
+        //            sb.AppendLine("\t\t{");
+        //            sb.AppendLine("\t\t\t if (_instance == null)");
+        //            sb.AppendLine("\t\t\t{");
+        //            sb.AppendLine("\t\t\t\tDataMgr ins = FindObjectOfType<DataMgr>();");
+        //            sb.AppendLine("\t\t\t\tif (ins == null)");
+        //            sb.AppendLine("\t\t\t\t{");
+        //            sb.AppendLine("\t\t\t\t\tDebug.LogError(\"场景中没有DataMgr组件，请添加\");");
+        //            sb.AppendLine("\t\t\t\t}");
+        //            sb.AppendLine("\t\t\t\telse");
+        //            sb.AppendLine("\t\t\t\t{");
+        //            sb.AppendLine("\t\t\t\t\t _instance = ins;");
+        //            sb.AppendLine("\t\t\t\t}");
+        //            sb.AppendLine("\t\t\t}");
+        //            sb.AppendLine("\t\t\treturn _instance;");
+        //            sb.AppendLine("\t\t}");
+        //            sb.AppendLine("\t}");
+
+        //            for (int i = 1; i <= workSheets.Count; i++)
+        //            {
+        //                Debug.Log(workSheets[i].Name);
+        //                sb.AppendLine($"\tpublic List<{workSheets[i].Name}> {workSheets[i].Name}_list;");
+        //            }
+
+
+
+
+        //            sb.AppendLine("\tpublic void Init(){\t\n");
+
+        //            for (int i = 1; i <= workSheets.Count; i++)
+        //            {
+        //                Debug.Log(workSheets[i].Name);
+        //                sb.AppendLine($"\t\t{workSheets[i].Name}_list = ExcelTool.ReadExcel<{workSheets[i].Name}>({i - 1});");
+        //            }
+
+
+        //            sb.AppendLine("\t}\n");
+
+        //            sb.AppendLine("\tpublic void SaveAll(JsonType type = JsonType.LitJson){\n");
+
+
+
+        //            sb.AppendLine("\t}");
+
+
+        //            sb.AppendLine("\tpublic void Save(object data, string fileName,JsonType type = JsonType.LitJson){\n");
+        //            sb.AppendLine($"\t\tJsonManager.Instance.SaveData(data,fileName,type);");
+        //            sb.AppendLine("\t}");
+
+
+
+        //            sb.AppendLine("}");
+        //            AssetDatabase.Refresh();
+        //            try
+        //            {
+        //                if (!Directory.Exists(dir))
+        //                {
+        //                    Directory.CreateDirectory(dir);
+        //                }
+        //                if (!File.Exists(path))
+        //                {
+        //                    File.Create(path).Dispose(); //避免资源占用
+        //                }
+        //                File.WriteAllText(path, sb.ToString());
+        //                AssetDatabase.Refresh();
+        //            }
+        //            catch (System.Exception e)
+        //            {
+
+        //            }
+        //        }
+        //    }
+        //}
+
+
+
+    }
     private void ExcelToJson()
     {
         if (!string.IsNullOrEmpty(txt_ExcelName))
@@ -413,4 +655,6 @@ public class ExcelWindow : EditorWindow
             Debug.LogError($"Excel转json时创建对应的实体类出错，实体类为：{sheet.Name},e:{e.Message}");
         }
     }
+
+   
 }

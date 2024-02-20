@@ -1,9 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using System;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
 
 public class Common
 {
@@ -80,6 +80,10 @@ public class Common
     /// </summary>
     private static List<string> videoExtensions = new List<string>() { ".mp4", ".avi", ".mov", ".m4v" };
     /// <summary>
+    /// 用于获取表格路径筛选的数组
+    /// </summary>
+    private static List<string> ExcelExtensions = new List<string>() { ".xlsx", ".xls", ".xlsm", };
+    /// <summary>
     /// 视频路径
     /// </summary>
     public static string[] videoFileName;
@@ -104,7 +108,10 @@ public class Common
         udpip = set.ReadValue("udpip", "127.0.0.1");
         tcpport = Int16.Parse(set.ReadValue("tcpport", "4020"));
         tcpip = set.ReadValue("tcpip", "127.0.0.1");
-
+        if (string.Equals(tcpip, "127.0.0.1"))
+        {
+            tcpip = GetLocalIPv4();
+        }
         GetVideoFiles(FilePath.VideoPath, out videoFileName);
     }
 
@@ -139,6 +146,60 @@ public class Common
             Debug.LogError("Videos文件夹不存在,请检查");
         }
         resultFileName = temp.ToArray();
+
+    }
+    public static string GetLocalIPv4()
+    {
+        string ipAddress = "";
+        try
+        {
+            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    ipAddress = ip.ToString();
+                    break;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("IP 获取失败");
+        }
+        return ipAddress;
+    }
+    public static string[] GetExcelFiles(string path)
+    {
+        List<string> temp = new List<string>();
+        try
+        {
+            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                string file = files[i];
+                // 判断文件扩展名是否在视频文件扩展名列表中
+                if (ExcelExtensions.Contains(System.IO.Path.GetExtension(file).ToLower()))
+                {
+                    // 如果文件扩展名是.mp4，则将其添加到videoFiles数组中
+                    // resultFileName[i] = file;
+                    temp.Add(file);
+                }
+                //else if ( System.IO.Path.GetExtension(file).ToLower() == ".avi" || System.IO.Path.GetExtension(file).ToLower() == ".mov"|| System.IO.Path.GetExtension(file).ToLower() == ".m4v")
+                //{
+                //    // 如果文件扩展名不是.mp4，则尝试获取其他格式的视频文件
+                //    //resultFileName[i] = file;
+                //    temp.Add(file);
+                //}
+            }
+        }
+        catch
+        {
+            Debug.LogError("excel文件夹不存在,请检查");
+        }
+        return temp.ToArray();
 
     }
 }
