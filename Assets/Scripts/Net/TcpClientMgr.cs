@@ -4,8 +4,6 @@ using System.Net;
 using UnityEngine;
 using System.IO;
 using System;
-using System.Text;
-using System.Threading;
 
 public class TcpClientMgr : MonoBehaviour
 {

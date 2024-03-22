@@ -1,9 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+using QFramework;
 using UnityEngine;
-using System.Diagnostics;
-using System;
-using UnityEngine.UI;
 
 /// <summary>
 /// 程序入口
@@ -50,6 +46,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         Init();
+       
     }
     public void Init()
     {
@@ -63,11 +60,17 @@ public class GameManager : MonoBehaviour
         NetInit();//初始化网络模式
         PoolMgr.Instance.Init();//初始化对象池
         UIMgr.Instance.Init();//UI初始化
+        ActionKit.Delay(1.0f, () =>
+        {
+
+            Debug.Log("延迟");
+        }).Start(this);
     }
 
     public void UdpMessageHandle(string message)
     {
         UnityEngine.Debug.Log(message);
+        
     }
 
     // Update is called once per frame

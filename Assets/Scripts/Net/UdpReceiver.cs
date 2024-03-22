@@ -1,10 +1,3 @@
-/*
-* @Author: 小羊
-* @Description:Udp信号接收
-* @Date: 2023年04月18日 星期二 20:04:11
-* @Modify:
-*/
-
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;

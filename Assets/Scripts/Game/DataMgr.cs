@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,12 +28,9 @@ public class DataMgr : MonoBehaviour
 	}
 	//表格：data_0
 	public List<MainData> data_0_MainData_list;
-	//表格：data_1
-	public List<MainData> data_1_MainData_list;
 	public void Init(){	
 
 		data_0_MainData_list = ExcelTool.ReadExcel<MainData>(0,0);
-		data_1_MainData_list = ExcelTool.ReadExcel<MainData>(0,1);
 	}
 
 	public void SaveAll(JsonType type = JsonType.LitJson){

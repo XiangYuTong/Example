@@ -1,18 +1,8 @@
-/*
-* @Author: 小羊
-* @Description:发送UDP消息
-* @Date: 2023年06月08日 星期四 17:06:33
-* @Modify:
-*/
-
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
-using System.IO;
 using System.Collections.Generic;
-using UnityEngine.tvOS;
 
 public class UdpSender : MonoBehaviour
 {
