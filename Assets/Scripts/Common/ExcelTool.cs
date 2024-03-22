@@ -23,7 +23,7 @@ public class ExcelTool : MonoBehaviour
     public static List<T> ReadExcel<T>(int sheetIndex, int excelIndex)
     {
         if (excelNames == null)
-            excelNames = Common.GetExcelFiles(Application.streamingAssetsPath + "/Excel");
+            excelNames = Common.GetExcelFiles("Excel");
         if (path_Dict == null)
         {
             path_Dict = new Dictionary<string, List<string>>();

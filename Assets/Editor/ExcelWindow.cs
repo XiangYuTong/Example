@@ -20,7 +20,7 @@ public class ExcelWindow : EditorWindow
     private string txt_ExcelName = "data.xls"; //表格名称
     private string txt_JsonSavePath = "Json";
     private string txt_EntitySavePath = "Entity";
-    private bool isMultiple = false;
+    private bool isMultiple = true;
     private Vector2 scrollPos;
     [MenuItem("Tools/ExcelToJson")]
     static void OpenWindow()
@@ -240,7 +240,10 @@ public class ExcelWindow : EditorWindow
                     sb.AppendLine("\t\t\t\tDataMgr ins = FindObjectOfType<DataMgr>();");
                     sb.AppendLine("\t\t\t\tif (ins == null)");
                     sb.AppendLine("\t\t\t\t{");
-                    sb.AppendLine("\t\t\t\t\tDebug.LogError(\"场景中没有DataMgr组件，请添加\");");
+                    sb.AppendLine("\t\t\t\t\tDebug.LogError(\"场景中没有DataMgr组件，已经自动生成\");");
+                    sb.AppendLine("\t\t\t\t\tGameObject go = new GameObject(nameof(DataMgr));");
+                    sb.AppendLine("\t\t\t\t\tgo.transform.parent = GameManager.instance.transform;");
+                    sb.AppendLine("\t\t\t\t\t_instance = go.AddComponent<DataMgr>();");
                     sb.AppendLine("\t\t\t\t}");
                     sb.AppendLine("\t\t\t\telse");
                     sb.AppendLine("\t\t\t\t{");
@@ -313,7 +316,7 @@ public class ExcelWindow : EditorWindow
 
     private void CreateMultipleExcelDataMgr()
     {
-        string[] excelNames = Common.GetExcelFiles(Application.streamingAssetsPath + "/Excel"); 
+        string[] excelNames = Common.GetExcelFiles("Excel"); 
         Dictionary<string, List<string>> path_Dict = new Dictionary<string, List<string>>();
       
 
@@ -361,7 +364,10 @@ public class ExcelWindow : EditorWindow
         sb.AppendLine("\t\t\t\tDataMgr ins = FindObjectOfType<DataMgr>();");
         sb.AppendLine("\t\t\t\tif (ins == null)");
         sb.AppendLine("\t\t\t\t{");
-        sb.AppendLine("\t\t\t\t\tDebug.LogError(\"场景中没有DataMgr组件，请添加\");");
+        sb.AppendLine("\t\t\t\t\tDebug.LogError(\"场景中没有DataMgr组件，已经自动生成\");");
+        sb.AppendLine("\t\t\t\t\tGameObject go = new GameObject(nameof(DataMgr));");
+        sb.AppendLine("\t\t\t\t\tgo.transform.parent = GameManager.instance.transform;");
+        sb.AppendLine("\t\t\t\t\t_instance = go.AddComponent<DataMgr>();");
         sb.AppendLine("\t\t\t\t}");
         sb.AppendLine("\t\t\t\telse");
         sb.AppendLine("\t\t\t\t{");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Diagnostics;
 using System;
+using UnityEngine.UI;
 
 /// <summary>
 /// 程序入口
@@ -42,7 +43,6 @@ public class GameManager : MonoBehaviour
     public bool timerEnable;
     [Header("自动垃圾回收开关")]
     public bool GCSwitch;
-
     // Start is called before the first frame update
     /// <summary>
     /// 所有系统初始化

@@ -4,6 +4,10 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Linq;
+using UnityEditor.PackageManager;
+using UnityEngine.UI;
+using System.Threading.Tasks;
 
 public class Common
 {
@@ -78,16 +82,22 @@ public class Common
     /// <summary>
     /// 用于获取视频路径筛选的数组
     /// </summary>
-    private static List<string> videoExtensions = new List<string>() { ".mp4", ".avi", ".mov", ".m4v" };
+    private static string videoExtensions ="*mp4|*.avi|*.mov|*.m4v";
     /// <summary>
     /// 用于获取表格路径筛选的数组
     /// </summary>
-    private static List<string> ExcelExtensions = new List<string>() { ".xlsx", ".xls", ".xlsm", };
+    private static string ExcelExtensions = "*.xlsx|*.xls|*.xlsm";
+    /// <summary>
+    /// 用于获取图片路径筛选的数组
+    /// </summary>
+    private static string pictureExtensions = "*.jpg|*.png|*.bmp";
     /// <summary>
     /// 视频路径
     /// </summary>
     public static string[] videoFileName;
-    public static void Init()
+
+    public static string[] imageFileName;
+    public static async void Init()
     {
         Setting set = new Setting();
         set.Open(FilePath.SettingPath);
@@ -112,40 +122,37 @@ public class Common
         {
             tcpip = GetLocalIPv4();
         }
-        GetVideoFiles(FilePath.VideoPath, out videoFileName);
+        videoFileName = GetVideoFiles(FilePath.VideoPath);
+        imageFileName = GetTexturePath(FilePath.PhotoPath);     
     }
 
-    public static void GetVideoFiles(string path, out string[] resultFileName)
+    public static string[] GetVideoFiles(string path)
     {
         List<string> temp = new List<string>();
         try
         {
-            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+            DirectoryInfo directoryInfo_1 = new DirectoryInfo(Application.streamingAssetsPath + "/" + path);
 
+            FileInfo[] files;
 
-            for (int i = 0; i < files.Length; i++)
+            string[] ImgType = videoExtensions.Split('|');
+
+            for (int j = 0; j < ImgType.Length; j++)
             {
-                string file = files[i];
-                // 判断文件扩展名是否在视频文件扩展名列表中
-                if (videoExtensions.Contains(System.IO.Path.GetExtension(file).ToLower()))
+                files = directoryInfo_1.GetFiles(ImgType[j]);
+
+                for (int i = 0; i < files.Length; i++)
                 {
-                    // 如果文件扩展名是.mp4，则将其添加到videoFiles数组中
-                    // resultFileName[i] = file;
-                    temp.Add(file);
+                    temp.Add(files[i].FullName);
                 }
-                //else if ( System.IO.Path.GetExtension(file).ToLower() == ".avi" || System.IO.Path.GetExtension(file).ToLower() == ".mov"|| System.IO.Path.GetExtension(file).ToLower() == ".m4v")
-                //{
-                //    // 如果文件扩展名不是.mp4，则尝试获取其他格式的视频文件
-                //    //resultFileName[i] = file;
-                //    temp.Add(file);
-                //}
             }
+ 
         }
         catch
         {
             Debug.LogError("Videos文件夹不存在,请检查");
         }
-        resultFileName = temp.ToArray();
+        return FileSort(temp).ToArray();
 
     }
     public static string GetLocalIPv4()
@@ -174,32 +181,115 @@ public class Common
         List<string> temp = new List<string>();
         try
         {
-            string[] files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+          
+            DirectoryInfo directoryInfo_1 = new DirectoryInfo(Application.streamingAssetsPath + "/" + path);
 
+            FileInfo[] files;
 
-            for (int i = 0; i < files.Length; i++)
+            string[] ImgType = ExcelExtensions.Split('|');
+
+            for (int j = 0; j < ImgType.Length; j++)
             {
-                string file = files[i];
-                // 判断文件扩展名是否在视频文件扩展名列表中
-                if (ExcelExtensions.Contains(System.IO.Path.GetExtension(file).ToLower()))
+                files = directoryInfo_1.GetFiles(ImgType[j]);
+
+                for (int i = 0; i < files.Length; i++)
                 {
-                    // 如果文件扩展名是.mp4，则将其添加到videoFiles数组中
-                    // resultFileName[i] = file;
-                    temp.Add(file);
+                    temp.Add(files[i].FullName);
                 }
-                //else if ( System.IO.Path.GetExtension(file).ToLower() == ".avi" || System.IO.Path.GetExtension(file).ToLower() == ".mov"|| System.IO.Path.GetExtension(file).ToLower() == ".m4v")
-                //{
-                //    // 如果文件扩展名不是.mp4，则尝试获取其他格式的视频文件
-                //    //resultFileName[i] = file;
-                //    temp.Add(file);
-                //}
             }
         }
         catch
         {
             Debug.LogError("excel文件夹不存在,请检查");
         }
-        return temp.ToArray();
+        return FileSort(temp).ToArray();
 
+    }
+
+    public static string[] GetTexturePath(string FoldPath)
+    {   
+
+        List<string> temp = new List<string>();
+        try
+        {
+            DirectoryInfo directoryInfo_1 = new DirectoryInfo(Application.streamingAssetsPath + "/" + FoldPath);
+
+            FileInfo[] files;
+
+            string[] ImgType = pictureExtensions.Split('|');
+
+            for (int j = 0; j < ImgType.Length; j++)
+            {
+                files = directoryInfo_1.GetFiles(ImgType[j]);
+
+                for (int i = 0; i < files.Length; i++)
+                {
+                    temp.Add(files[i].FullName);
+                }
+            }
+        }
+        catch (Exception)
+        {
+
+            Debug.LogError("Photos文件夹不存在,请检查");
+        }
+      
+        return FileSort(temp).ToArray();
+
+    }
+
+    private static async Task LoadByFSAsync(string path, RawImage image)
+    {
+        byte[] result;
+
+        using (FileStream SourceStream = File.Open(path, FileMode.Open))
+        {
+            result = new byte[SourceStream.Length];
+            await SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
+        }
+
+        Texture2D tx = new Texture2D(2, 1);
+
+        tx.LoadImage(result);
+
+        float widthRatio = tx.width / image.rectTransform.sizeDelta.x;
+        float heightRatio = tx.height / image.rectTransform.sizeDelta.y;
+
+        if (widthRatio / heightRatio > 1.1)
+        {
+            image.GetComponent<RectTransform>().sizeDelta = new Vector2(tx.width / widthRatio, tx.height / widthRatio);
+        }
+        else
+        {
+            image.GetComponent<RectTransform>().sizeDelta = new Vector2(tx.width / heightRatio, tx.height / heightRatio);
+        }
+
+        image.texture = tx;
+    }
+    public static List<string> FileSort(List<string> path)
+    {
+        string temp;
+        for (int i = 0; i < path.Count - 1; i++)
+        {
+            for (int j = 0; j < path.Count - 1 - i; j++)
+            {
+                if (CustomSort(path[j], path[j + 1]))
+                {
+                    temp = path[j];
+                    path[j] = path[j + 1];
+                    path[j + 1] = temp;
+                }
+            }
+        }
+        return path;
+    }
+    public static bool CustomSort(string str1, string str2)
+    {
+        int result1 = Convert.ToInt32(System.Text.RegularExpressions.Regex.Replace(str1, @"[^0-9]+", ""));
+        int result2 = Convert.ToInt32(System.Text.RegularExpressions.Regex.Replace(str2, @"[^0-9]+", ""));
+        if (result1 > result2)
+            return true;
+        else
+            return false;
     }
 }
