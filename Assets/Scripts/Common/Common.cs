@@ -94,8 +94,12 @@ public class Common
     /// </summary>
     public static string[] videoFileName;
 
+    public static string[] bgVideoFileName;
+
     public static string[] imageFileName;
-    public static async void Init()
+
+    public static List<Texture2D> textures;
+    public static void Init()
     {
         Setting set = new Setting();
         set.Open(FilePath.SettingPath);
@@ -121,7 +125,8 @@ public class Common
             tcpip = GetLocalIPv4();
         }
         videoFileName = GetVideoFiles(FilePath.VideoPath);
-        imageFileName = GetTexturePath(FilePath.PhotoPath);     
+        bgVideoFileName = GetVideoFiles(FilePath.BgVideoPath);
+        imageFileName = GetTexturePath(FilePath.PhotoPath);
     }
 
     public static string[] GetVideoFiles(string path)
@@ -236,7 +241,7 @@ public class Common
 
     }
 
-    private static async Task LoadByFSAsync(string path, RawImage image)
+    public static async Task LoadByFSAsync(string path, RawImage image)
     {
         byte[] result;
 
@@ -244,6 +249,34 @@ public class Common
         {
             result = new byte[SourceStream.Length];
             await SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
+        }
+
+        Texture2D tx = new Texture2D(2, 1);
+
+        tx.LoadImage(result);
+
+        float widthRatio = tx.width / image.rectTransform.sizeDelta.x;
+        float heightRatio = tx.height / image.rectTransform.sizeDelta.y;
+
+        if (widthRatio / heightRatio > 1.1)
+        {
+            image.GetComponent<RectTransform>().sizeDelta = new Vector2(tx.width / widthRatio, tx.height / widthRatio);
+        }
+        else
+        {
+            image.GetComponent<RectTransform>().sizeDelta = new Vector2(tx.width / heightRatio, tx.height / heightRatio);
+        }
+
+        image.texture = tx;
+    }
+    public static void LoadByFSSync(string path, RawImage image)
+    {
+        byte[] result;
+
+        using (FileStream SourceStream = File.Open(path, FileMode.Open))
+        {
+            result = new byte[SourceStream.Length];
+            SourceStream.Read(result, 0, (int)SourceStream.Length);
         }
 
         Texture2D tx = new Texture2D(2, 1);
@@ -289,5 +322,48 @@ public class Common
             return true;
         else
             return false;
+    }
+
+    private Sprite TextureToSprite(Texture2D tex)
+    {
+        Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+        return sprite;
+    }
+
+    public static Texture2D LoadPicTexture(string Path)
+    {
+        if (File.Exists(Path))
+        {
+            FileStream fileStream = new FileStream(Path, FileMode.Open, FileAccess.Read);
+            fileStream.Seek(0, SeekOrigin.Begin);
+            //创建文件长度缓冲区
+            byte[] bytes = new byte[fileStream.Length];
+            //读取文件
+            fileStream.Read(bytes, 0, (int)fileStream.Length);
+            //释放文件读取流
+            fileStream.Close();
+            fileStream.Dispose();
+            fileStream = null;
+            //创建Texture
+            int width = 1080;
+            int height = 1920;
+            Texture2D texture = new Texture2D(width, height);
+            texture.LoadImage(bytes);
+
+            return texture;
+        }
+
+        return null;
+    }
+
+    public static List<Texture2D> LoadPicTextures(string[] Path)
+    {
+        List<Texture2D> temp = new List<Texture2D>();
+        foreach (var item in Path)
+        {
+            Texture2D tex = LoadPicTexture(item);
+            temp.Add(tex); 
+        }
+        return temp;
     }
 }

@@ -26,4 +26,4 @@ hidetaskbar:1
 //是否调试模式
 debug:0
 //返回屏保时间 0为不启动 单位秒
-backtime:5
+backtime:0

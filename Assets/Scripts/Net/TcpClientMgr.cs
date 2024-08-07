@@ -44,13 +44,16 @@ public class TcpClientMgr : MonoBehaviour
     }
     public void Init()
     {
-        m_ReceiveBuffer = new byte[1024 * 512];
+        m_ReceiveBuffer = new byte[1024 * 10240];
         m_SendQueue = new Queue<byte[]>();
         m_ReceiveQueue = new Queue<byte[]>();
         m_OnEventCallQueue = new Queue<Action>();
+        Connect(Common.tcpip, Common.tcpport);
     }
     public void Connect(string ip, int port)
     {
+        if (ip == Common.GetLocalIPv4())
+            return;
         m_IP = ip;
         m_Port = port;
         m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -127,6 +130,8 @@ public class TcpClientMgr : MonoBehaviour
     {
         if (m_IsConnected)
             CheckReceiveBuffer();
+        else
+            Connect(Common.tcpip, Common.tcpport);
         if (m_OnEventCallQueue != null)
         {
             if (m_OnEventCallQueue.Count > 0)

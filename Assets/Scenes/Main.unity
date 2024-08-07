@@ -223,7 +223,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 845968925}
-  m_Father: {fileID: 1260667756}
+  m_Father: {fileID: 1260667753}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -326,7 +326,7 @@ Transform:
   - {fileID: 1519023714}
   - {fileID: 1311065397}
   - {fileID: 686229995}
-  - {fileID: 1260667756}
+  - {fileID: 1260667753}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -342,9 +342,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87c6947fe600c044e8b0dd8a7ae96aee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  netType: 0
+  netType: 5
   timerEnable: 0
   GCSwitch: 1
+  isUdpAsyn: 1
 --- !u!114 &294712282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -496,7 +497,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3c966b1cdaa12449a6ea750a7a7f307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isOpen: 0
+  isOpen: 1
 --- !u!1 &896953609
 GameObject:
   m_ObjectHideFlags: 0
@@ -633,7 +634,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1260667756}
+  - component: {fileID: 1260667753}
   - component: {fileID: 1260667752}
   m_Layer: 5
   m_Name: UIMgr
@@ -654,8 +655,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5bd4ddabadb11c40b0c9431447e66e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!224 &1260667756
-RectTransform:
+--- !u!4 &1260667753
+Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -670,11 +671,6 @@ RectTransform:
   m_Father: {fileID: 294712280}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 960, y: 540}
-  m_SizeDelta: {x: 1920, y: 1080}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1311065396
 GameObject:
   m_ObjectHideFlags: 0

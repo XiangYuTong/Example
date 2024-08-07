@@ -3,6 +3,9 @@ using System.Net.Sockets;
 using UnityEngine;
 using System;
 using System.Collections;
+using QFramework;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
+using System.Threading;
 
 public class UdpReceiver : MonoBehaviour
 {
@@ -29,21 +32,39 @@ public class UdpReceiver : MonoBehaviour
             return _instance;
         }
     }
+    private UdpClient udpClient;
     private Socket serverSocket;
     private static int udpPort = 8886;
     private bool openReceive = true;
+    private bool isOpenReceive = false;
     private EndPoint epSender;
+    private IPEndPoint remoteEndPoint;
+    private Thread t;
+    private object lockObject = new object();
     public string receiveString = "";
     private byte[] ReceiveData = new byte[1024];
     [Header("Udp数据接收回调事件")]
     public CallBack<string> OnUdpMessageHandle;
-    public void Init()
+    public bool isUdpAsyn;
+    public void Init(bool arg)
     {
+        isUdpAsyn = arg;
         udpPort = Common.udpport;
-        UDPCreate();
-        OnUdpMessageHandle += GameManager.instance.UdpMessageHandle;
-        EventCenter.AddListener<string>(EventTypes.UdpMessageHandle, OnUdpMessageHandle);
+        if (isUdpAsyn)
+        {
+            UDPCreate();
+            OnUdpMessageHandle += GameManager.instance.UdpMessageHandle;
+            EventCenter.AddListener<string>(EventTypes.UdpMessageHandle, OnUdpMessageHandle);
+        }
+        else
+        {
+            udpClient = new UdpClient(udpPort);
+            remoteEndPoint = new IPEndPoint(IPAddress.Any, 0); // 0 表示任意端口                                                             // 创建并启动线程
+            t = new Thread(new ThreadStart(ReceiveUDP));
+            t.Start();
+        }
     }
+
 
     public void UDPCreate()
     {
@@ -95,6 +116,27 @@ public class UdpReceiver : MonoBehaviour
         //BytesToStruct(iar,epSender);
         //reciveText.text = str;
     }
+    private void Update()
+    {
+        if (isOpenReceive)
+        {
+            lock (lockObject)
+            {
+                GameManager.instance.UdpMessageHandle(receiveString);
+                isOpenReceive = false;
+            }
+
+        }
+    }
+    private void ReceiveUDP()
+    {
+        while (true)
+        {
+            receiveString = System.Text.Encoding.UTF8.GetString(udpClient.Receive(ref remoteEndPoint));
+            Debug.Log("Received message: " + receiveString + " from " + remoteEndPoint);
+            isOpenReceive = true;
+        }
+    }
     /// <summary>
     /// 关闭Socket
     /// </summary>
@@ -112,6 +154,15 @@ public class UdpReceiver : MonoBehaviour
     private void OnApplicationQuit()
     {
         SocketQuit();
+        if (this.t != null)
+        {
+            this.t.Abort();
+        }
+
+        if (this.udpClient != null)
+        {
+            this.udpClient.Close();
+        }
     }
 
     /// <summary>
@@ -120,6 +171,15 @@ public class UdpReceiver : MonoBehaviour
     private void OnDisable()
     {
         SocketQuit();
+        if (this.t != null)
+        {
+            this.t.Abort();
+        }
+
+        if (this.udpClient != null)
+        {
+            this.udpClient.Close();
+        }
     }
 
 }

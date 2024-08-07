@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using DG.Tweening;
 using UnityEngine.UI;
 
 public class UIpanel : MonoBehaviour
@@ -24,6 +26,15 @@ public class UIpanel : MonoBehaviour
     {
         HClose();
     }
+    public virtual void Show(Tween tween)
+    {
+        Open();
+        tween?.Play();
+    }
+    public virtual void Hide(Tween tween)
+    {
+        tween?.OnComplete(Open);
+    }
     /// <summary>
     /// 有效果的打开
     /// </summary>
@@ -40,6 +51,8 @@ public class UIpanel : MonoBehaviour
         isOpen = false;
         gameObject.SetActive(false);
     }
+
+   
 }
 
 

@@ -1,4 +1,3 @@
-using QFramework;
 using UnityEngine;
 
 /// <summary>
@@ -39,6 +38,8 @@ public class GameManager : MonoBehaviour
     public bool timerEnable;
     [Header("自动垃圾回收开关")]
     public bool GCSwitch;
+    [Header("UDP是否异步接受")]
+    public bool isUdpAsyn = true;
     // Start is called before the first frame update
     /// <summary>
     /// 所有系统初始化
@@ -60,11 +61,6 @@ public class GameManager : MonoBehaviour
         NetInit();//初始化网络模式
         PoolMgr.Instance.Init();//初始化对象池
         UIMgr.Instance.Init();//UI初始化
-        ActionKit.Delay(1.0f, () =>
-        {
-
-            Debug.Log("延迟");
-        }).Start(this);
     }
 
     public void UdpMessageHandle(string message)
@@ -109,14 +105,14 @@ public class GameManager : MonoBehaviour
                 UdpSender.Instance.Init();
                 break;
             case NetType.UdpReceiver:
-                UdpReceiver.Instance.Init();
+                UdpReceiver.Instance.Init(isUdpAsyn);
                 break;
             case NetType.UdpBoth:
                 UdpSender.Instance.Init();
-                UdpReceiver.Instance.Init();
+                UdpReceiver.Instance.Init(isUdpAsyn);
                 break;
             case NetType.TcpServer:
-                TcpServerMgr.Instance.Init();      
+                TcpServerMgr.Instance.Init();
                 break;
             case NetType.TcpClient:
                 TcpClientMgr.Instance.Init();
