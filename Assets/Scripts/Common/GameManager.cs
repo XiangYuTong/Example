@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -30,7 +31,8 @@ public class GameManager : MonoBehaviour
     {
         None, UdpSender, UdpReceiver,UdpBoth, TcpServer, TcpClient
     }
-  
+    bool Islate = false;
+    public GameObject Tip;
 
     [Header("网络模式")]
     public NetType netType;
@@ -40,14 +42,18 @@ public class GameManager : MonoBehaviour
     public bool GCSwitch;
     [Header("UDP是否异步接受")]
     public bool isUdpAsyn = true;
+    //时间锁是否打开
+    private bool isOpenLocker = false;
     // Start is called before the first frame update
     /// <summary>
     /// 所有系统初始化
     /// </summary>
     private void Awake()
-    {
-        Init();
-       
+    {   
+        if(isOpenLocker)
+            CheckLocker();
+        if (Islate == false)
+            Init();
     }
     public void Init()
     {
@@ -62,11 +68,39 @@ public class GameManager : MonoBehaviour
         PoolMgr.Instance.Init();//初始化对象池
         UIMgr.Instance.Init();//UI初始化
     }
-
+    private void CheckLocker()
+    {
+        Tip.SetActive(false);
+        //DateTime minTime = Convert.ToDateTime("2019-8-1 15:29:00");
+        DateTime maxTime = Convert.ToDateTime("2024-9-18 11:31:00");
+        if (DateTime.Now >= maxTime)
+        {
+            //不在使用时间内，会直接退出程序
+            Islate = true;
+        }
+        try
+        {
+            //限制使用时间，如果不在这个区间内,直接退出程序
+            if (Islate)
+            {
+                Tip.SetActive(true);
+                Invoke("OnExit", 5);//延时退出，可在退出前显示提示消息
+            }
+        }
+        catch
+        {
+            Islate = false;
+        }
+    }
+    private void OnExit()
+    {
+        Application.Quit();
+    }
     public void UdpMessageHandle(string message)
     {
         UnityEngine.Debug.Log(message);
-        
+        if (String.IsNullOrEmpty(message))
+            return;
     }
 
     // Update is called once per frame
@@ -77,7 +111,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S))
         {
-            UdpSender.Instance.Sendmessage("你好");
+            //UdpSender.Instance.Sendmessage("你好");
         }
     }
     private float lastGCTime;

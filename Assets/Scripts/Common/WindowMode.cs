@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class WindowMode : MonoBehaviour
 {
@@ -164,6 +165,43 @@ public class WindowMode : MonoBehaviour
             IntPtr hwnd = FindWindow(null, Application.productName);
             ShowWindow(hwnd, SW_MINIMIZE);
         }
+    }
+    public Process FindApp(string name)
+    {
+        Process result = null;
+        Process[] processes = Process.GetProcesses();
+        foreach (Process process in processes)
+        {
+            try
+            {
+                if (!process.HasExited && process.ProcessName == name)
+                {
+                    result = process;
+                    //process.OnExited();
+                    //ShowWindow(process.MainWindowHandle, SW_SHOWMINIMIZED);          
+                }
+            }
+            catch
+            {
+               
+            }
+        }
+        return result;
+    }
+    public void KillApp(string name)
+    {
+        Process process = FindApp(name);
+        process.Kill();
+    }
+    public void HideApp(string name)
+    {
+        Process process = FindApp(name);
+        ShowWindow(process.MainWindowHandle, SW_MINIMIZE);
+    }
+    public void ShowApp(string name)
+    {
+        Process process = FindApp(name);
+        ShowWindow(process.MainWindowHandle, SW_RESTORE);
     }
     /// <summary>
     /// 显示任务栏
