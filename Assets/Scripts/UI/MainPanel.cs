@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class MainPanel : UIpanel
-{
+{   
     public override void Init()
     {
         base.Init();

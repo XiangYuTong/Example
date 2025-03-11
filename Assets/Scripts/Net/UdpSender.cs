@@ -47,9 +47,9 @@ public class UdpSender : MonoBehaviour
     public void DataInit()
     {
         //修改端口
-        port = Common.udpport;
+        port = Common.udpport_sender;
         //
-        ips = Setting.ReadTextSplit(Common.udpip, '_');
+        ips = Setting.ReadTextSplit(Common.udpip_sender, '_');
         foreach (var item in ips)
         {
             IPEndPoint ipendpoint = new IPEndPoint(IPAddress.Parse(item), port);

@@ -49,7 +49,7 @@ public class UdpReceiver : MonoBehaviour
     public void Init(bool arg)
     {
         isUdpAsyn = arg;
-        udpPort = Common.udpport;
+        udpPort = Common.udpport_reciver;
         if (isUdpAsyn)
         {
             UDPCreate();
@@ -133,7 +133,7 @@ public class UdpReceiver : MonoBehaviour
         while (true)
         {
             receiveString = System.Text.Encoding.UTF8.GetString(udpClient.Receive(ref remoteEndPoint));
-            Debug.Log("Received message: " + receiveString + " from " + remoteEndPoint);
+            //Debug.Log("Received message: " + receiveString + " from " + remoteEndPoint);
             isOpenReceive = true;
         }
     }

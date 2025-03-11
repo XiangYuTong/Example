@@ -64,11 +64,15 @@ public class Common
     /// <summary>
     /// #udpserver监听端口
     /// </summary>
-    public static int udpport = 8886;
+    public static int udpport_reciver = 8886;
     /// <summary>
-    /// UDPIP地址
+    /// #udpclient发送端口
     /// </summary>
-    public static string udpip;
+    public static int udpport_sender = 8886;
+    /// <summary>
+    /// UDP发送IP地址
+    /// </summary>
+    public static string udpip_sender;
     /// <summary>
     /// #tcpserver监听端口
     /// </summary>
@@ -77,21 +81,6 @@ public class Common
     /// TCPIP地址
     /// </summary>
     public static string tcpip;
-    /// <summary>
-    /// 用于获取视频路径筛选的数组
-    /// </summary>
-    private static string videoExtensions ="*mp4|*.avi|*.mov|*.m4v";
-    /// <summary>
-    /// 用于获取表格路径筛选的数组
-    /// </summary>
-    private static string ExcelExtensions = "*.xlsx|*.xls|*.xlsm";
-    /// <summary>
-    /// 用于获取图片路径筛选的数组
-    /// </summary>
-    private static string pictureExtensions = "*.jpg|*.png|*.bmp";
-    /// <summary>
-    /// 视频路径
-    /// </summary>
     public static string[] videoFileName;
 
     public static string[] bgVideoFileName;
@@ -116,254 +105,18 @@ public class Common
         backtime = Int16.Parse(set.ReadValue("backtime", "300"));
         httpport = Int16.Parse(set.ReadValue("httpport", "8020"));
         httpip = set.ReadValue("httpip", "127.0.0.1");
-        udpport = Int16.Parse(set.ReadValue("udpport", "8886"));
-        udpip = set.ReadValue("udpip", "127.0.0.1");
+        udpport_reciver = Int16.Parse(set.ReadValue("udpport_reciver", "8886"));
+        udpport_sender = Int16.Parse(set.ReadValue("udpport_sender", "8886"));
+        udpip_sender = set.ReadValue("udpip_sender", "127.0.0.1");
         tcpport = Int16.Parse(set.ReadValue("tcpport", "4020"));
         tcpip = set.ReadValue("tcpip", "127.0.0.1");
         if (string.Equals(tcpip, "127.0.0.1"))
         {
-            tcpip = GetLocalIPv4();
+            tcpip = ToolUnit.GetLocalIPv4();
         }
-        videoFileName = GetVideoFiles(FilePath.VideoPath);
-        bgVideoFileName = GetVideoFiles(FilePath.BgVideoPath);
-        imageFileName = GetTexturePath(FilePath.PhotoPath);
+        videoFileName = ToolUnit.GetVideoFiles(FilePath.VideoPath);
+        bgVideoFileName = ToolUnit.GetVideoFiles(FilePath.BgVideoPath);
+        imageFileName = ToolUnit.GetTexturePath(FilePath.PhotoPath);
     }
-
-    public static string[] GetVideoFiles(string path)
-    {
-        List<string> temp = new List<string>();
-        try
-        {
-            DirectoryInfo directoryInfo_1 = new DirectoryInfo(Application.streamingAssetsPath + "/" + path);
-
-            FileInfo[] files;
-
-            string[] ImgType = videoExtensions.Split('|');
-
-            for (int j = 0; j < ImgType.Length; j++)
-            {
-                files = directoryInfo_1.GetFiles(ImgType[j]);
-
-                for (int i = 0; i < files.Length; i++)
-                {
-                    temp.Add(files[i].FullName);
-                }
-            }
- 
-        }
-        catch
-        {
-            Debug.LogError("Videos文件夹不存在,请检查");
-        }
-        return FileSort(temp).ToArray();
-
-    }
-    public static string GetLocalIPv4()
-    {
-        string ipAddress = "";
-        try
-        {
-            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
-            foreach (IPAddress ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    ipAddress = ip.ToString();
-                    break;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("IP 获取失败");
-        }
-        return ipAddress;
-    }
-    public static string[] GetExcelFiles(string path)
-    {
-        List<string> temp = new List<string>();
-        try
-        {
-          
-            DirectoryInfo directoryInfo_1 = new DirectoryInfo(Application.streamingAssetsPath + "/" + path);
-
-            FileInfo[] files;
-
-            string[] ImgType = ExcelExtensions.Split('|');
-
-            for (int j = 0; j < ImgType.Length; j++)
-            {
-                files = directoryInfo_1.GetFiles(ImgType[j]);
-
-                for (int i = 0; i < files.Length; i++)
-                {
-                    temp.Add(files[i].FullName);
-                }
-            }
-        }
-        catch
-        {
-            Debug.LogError("excel文件夹不存在,请检查");
-        }
-        return FileSort(temp).ToArray();
-
-    }
-
-    public static string[] GetTexturePath(string FoldPath)
-    {   
-
-        List<string> temp = new List<string>();
-        try
-        {
-            DirectoryInfo directoryInfo_1 = new DirectoryInfo(Application.streamingAssetsPath + "/" + FoldPath);
-
-            FileInfo[] files;
-
-            string[] ImgType = pictureExtensions.Split('|');
-
-            for (int j = 0; j < ImgType.Length; j++)
-            {
-                files = directoryInfo_1.GetFiles(ImgType[j]);
-
-                for (int i = 0; i < files.Length; i++)
-                {
-                    temp.Add(files[i].FullName);
-                }
-            }
-        }
-        catch (Exception)
-        {
-
-            Debug.LogError("Photos文件夹不存在,请检查");
-        }
-      
-        return FileSort(temp).ToArray();
-
-    }
-
-    public static async Task LoadByFSAsync(string path, RawImage image)
-    {
-        byte[] result;
-
-        using (FileStream SourceStream = File.Open(path, FileMode.Open))
-        {
-            result = new byte[SourceStream.Length];
-            await SourceStream.ReadAsync(result, 0, (int)SourceStream.Length);
-        }
-
-        Texture2D tx = new Texture2D(2, 1);
-
-        tx.LoadImage(result);
-
-        float widthRatio = tx.width / image.rectTransform.sizeDelta.x;
-        float heightRatio = tx.height / image.rectTransform.sizeDelta.y;
-
-        if (widthRatio / heightRatio > 1.1)
-        {
-            image.GetComponent<RectTransform>().sizeDelta = new Vector2(tx.width / widthRatio, tx.height / widthRatio);
-        }
-        else
-        {
-            image.GetComponent<RectTransform>().sizeDelta = new Vector2(tx.width / heightRatio, tx.height / heightRatio);
-        }
-
-        image.texture = tx;
-    }
-    public static void LoadByFSSync(string path, RawImage image)
-    {
-        byte[] result;
-
-        using (FileStream SourceStream = File.Open(path, FileMode.Open))
-        {
-            result = new byte[SourceStream.Length];
-            SourceStream.Read(result, 0, (int)SourceStream.Length);
-        }
-
-        Texture2D tx = new Texture2D(2, 1);
-
-        tx.LoadImage(result);
-
-        float widthRatio = tx.width / image.rectTransform.sizeDelta.x;
-        float heightRatio = tx.height / image.rectTransform.sizeDelta.y;
-
-        if (widthRatio / heightRatio > 1.1)
-        {
-            image.GetComponent<RectTransform>().sizeDelta = new Vector2(tx.width / widthRatio, tx.height / widthRatio);
-        }
-        else
-        {
-            image.GetComponent<RectTransform>().sizeDelta = new Vector2(tx.width / heightRatio, tx.height / heightRatio);
-        }
-
-        image.texture = tx;
-    }
-    public static List<string> FileSort(List<string> path)
-    {
-        string temp;
-        for (int i = 0; i < path.Count - 1; i++)
-        {
-            for (int j = 0; j < path.Count - 1 - i; j++)
-            {
-                if (CustomSort(path[j], path[j + 1]))
-                {
-                    temp = path[j];
-                    path[j] = path[j + 1];
-                    path[j + 1] = temp;
-                }
-            }
-        }
-        return path;
-    }
-    public static bool CustomSort(string str1, string str2)
-    {
-        int result1 = Convert.ToInt32(System.Text.RegularExpressions.Regex.Replace(str1, @"[^0-9]+", ""));
-        int result2 = Convert.ToInt32(System.Text.RegularExpressions.Regex.Replace(str2, @"[^0-9]+", ""));
-        if (result1 > result2)
-            return true;
-        else
-            return false;
-    }
-
-    private Sprite TextureToSprite(Texture2D tex)
-    {
-        Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-        return sprite;
-    }
-
-    public static Texture2D LoadPicTexture(string Path)
-    {
-        if (File.Exists(Path))
-        {
-            FileStream fileStream = new FileStream(Path, FileMode.Open, FileAccess.Read);
-            fileStream.Seek(0, SeekOrigin.Begin);
-            //创建文件长度缓冲区
-            byte[] bytes = new byte[fileStream.Length];
-            //读取文件
-            fileStream.Read(bytes, 0, (int)fileStream.Length);
-            //释放文件读取流
-            fileStream.Close();
-            fileStream.Dispose();
-            fileStream = null;
-            //创建Texture
-            int width = 1080;
-            int height = 1920;
-            Texture2D texture = new Texture2D(width, height);
-            texture.LoadImage(bytes);
-
-            return texture;
-        }
-
-        return null;
-    }
-
-    public static List<Texture2D> LoadPicTextures(string[] Path)
-    {
-        List<Texture2D> temp = new List<Texture2D>();
-        foreach (var item in Path)
-        {
-            Texture2D tex = LoadPicTexture(item);
-            temp.Add(tex); 
-        }
-        return temp;
-    }
+  
 }

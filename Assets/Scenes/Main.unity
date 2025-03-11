@@ -446,11 +446,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tip: {fileID: 263513702}
-  netType: 5
+  netType: 0
   timerEnable: 0
   GCSwitch: 1
-  isUdpAsyn: 1
-  isOpenLocker: 0
+  isUdpAsyn: 0
 --- !u!114 &294712282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1004,7 +1003,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

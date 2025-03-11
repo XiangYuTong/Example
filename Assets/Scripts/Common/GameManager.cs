@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour
             if (Islate)
             {
                 Tip.SetActive(true);
-                Invoke("OnExit", 5);//延时退出，可在退出前显示提示消息
+                //Invoke("OnExit", 5);//延时退出，可在退出前显示提示消息
             }
         }
         catch
@@ -111,7 +111,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S))
         {
-            //UdpSender.Instance.Sendmessage("你好");
+            UdpSender.Instance.Sendmessage("你好");
         }
     }
     private float lastGCTime;

@@ -52,7 +52,7 @@ public class TcpClientMgr : MonoBehaviour
     }
     public void Connect(string ip, int port)
     {
-        if (ip == Common.GetLocalIPv4())
+        if (ip == ToolUnit.GetLocalIPv4())
             return;
         m_IP = ip;
         m_Port = port;

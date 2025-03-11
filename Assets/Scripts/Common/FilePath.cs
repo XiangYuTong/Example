@@ -13,5 +13,6 @@ public class FilePath
     public static void Init()
     {
         SettingPath = DataPath + SettingPath;
+        //SettingPath = "\\\\192.168.2.207\\Users\\MLoong\\Desktop\\¹²Ïí\\Setting.txt";
     }
 }
