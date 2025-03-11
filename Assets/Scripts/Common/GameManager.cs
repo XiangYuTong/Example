@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
     }
     bool Islate = false;
     public GameObject Tip;
+    public GameObject WaterMask;
 
     [Header("网络模式")]
     public NetType netType;
@@ -67,6 +68,15 @@ public class GameManager : MonoBehaviour
         NetInit();//初始化网络模式
         PoolMgr.Instance.Init();//初始化对象池
         UIMgr.Instance.Init();//UI初始化
+        if (Common.watermaskpassword == "HJP")
+        {
+            WaterMask.SetActive(false);
+        }
+        else
+        {
+            WaterMask.SetActive(true);
+        }
+
     }
     private void CheckLocker()
     {

@@ -81,6 +81,8 @@ public class Common
     /// TCPIPµÿ÷∑
     /// </summary>
     public static string tcpip;
+
+    public static string watermaskpassword;
     public static string[] videoFileName;
 
     public static string[] bgVideoFileName;
@@ -110,6 +112,7 @@ public class Common
         udpip_sender = set.ReadValue("udpip_sender", "127.0.0.1");
         tcpport = Int16.Parse(set.ReadValue("tcpport", "4020"));
         tcpip = set.ReadValue("tcpip", "127.0.0.1");
+        watermaskpassword = set.ReadValue("watermaskpassword", "");
         if (string.Equals(tcpip, "127.0.0.1"))
         {
             tcpip = ToolUnit.GetLocalIPv4();

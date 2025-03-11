@@ -28,3 +28,5 @@ hidetaskbar:1
 debug:0
 //返回屏保时间 0为不启动 单位秒
 backtime:0
+//去除水印密码
+watermaskpassword:
